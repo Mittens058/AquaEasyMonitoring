@@ -166,7 +166,7 @@ void sendSensor()
   Serial.print("Water Level: ");
   Serial.println(percentage_level);
 
-  Blynk.virtualWrite(V0,temperatureC);
+  Blynk.virtualWrite(V4,percentage_level);
   delay(timedelay);
 }
 
