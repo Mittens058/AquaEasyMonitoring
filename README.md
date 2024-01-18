@@ -15,3 +15,8 @@ Water Quality Monitoring and Control System Using ESP32 Microcontroller
 2. AquaSpeed Submersible Water Pump A2000
 3. 13W UV Light Submersible Lamp
 4. A servo motor will also be used for the automatic feeder.
+
+
+sources :
+
+https://github.com/GreenPonik/DFRobot_ESP_EC_BY_GREENPONIK?tab=readme-ov-file
