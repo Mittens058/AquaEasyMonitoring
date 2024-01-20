@@ -1,0 +1,100 @@
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#include <WiFi.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#endif
+#include <WiFiClientSecure.h>
+
+const char* ssid = "TP-Link_Extender"; //--> Your wifi name or SSID.
+const char* password = ""; //--> Your wifi password.
+
+//----------------------------------------Host & httpsPort
+const char* host = "script.google.com";
+const int httpsPort = 443;
+//----------------------------------------
+
+WiFiClientSecure client; //--> Create a WiFiClientSecure object.
+
+String GAS_ID = "AKfycbzn5IblU5fw4IWzvYwJRMsfT4xbjLZe2aYdWkzm8bBGEdy52VPBPyyRCWjE_WorYwkJxw"; //--> spreadsheet script ID
+
+void setup() {
+ // put your setup code here, to run once:
+ Serial.begin(115200);
+ delay(500);
+ WiFi.begin(ssid, password); //--> Connect to your WiFi router
+ Serial.println("");
+
+ //----------------------------------------Wait for connection
+ Serial.print("Connecting");
+ while (WiFi.status() != WL_CONNECTED) {
+ Serial.print(".");
+ }
+
+
+}
+
+void loop() {
+  // ... (existing code)
+
+  float temperature = 25; 
+  float dissolvedOxygen = 30/* get your dissolvedOxygen value */;
+  float waterLevel = 40 /* get your waterLevel value */;
+  float salinity = 30 /* get your salinity value */;
+  float pHLevel = 46/* get your pHLevel value */;
+
+  sendData(temperature, dissolvedOxygen, waterLevel, salinity, pHLevel); //--> Calls the sendData Subroutine
+}
+
+// Subroutine for sending data to Google Sheets
+void sendData(float temperature, float dissolvedOxygen, float waterLevel, float salinity, float pHLevel) {
+ Serial.println("==========");
+ Serial.print("connecting to ");
+ Serial.println(host); 
+ //----------------------------------------Connect to Google host
+ if (!client.connect(host, httpsPort)) {
+ Serial.println("connection failed");
+ return;
+ }
+ //----------------------------------------
+
+ //----------------------------------------Processing data and sending data
+  String string_temperature = String(temperature);
+  String string_dissolvedOxygen = String(dissolvedOxygen);
+  String string_waterLevel = String(waterLevel);
+  String string_salinity = String(salinity);
+  String string_pHLevel = String(pHLevel);
+  
+  String url = "/macros/s/" + GAS_ID + "/exec?TEMPERATURE=" + string_temperature + "&DISSOLVED_OXYGEN=" + string_dissolvedOxygen +
+               "&WATER_LEVEL=" + string_waterLevel +
+               "&SALINITY=" + string_salinity +
+               "&PH_LEVEL=" + string_pHLevel;
+
+
+ client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+ "Host: " + host + "\r\n" +
+ "User-Agent: BuildFailureDetectorESP32 \r\n" +
+ "Connection: close\r\n\r\n");
+
+ Serial.println("request sent");
+ //----------------------------------------
+
+ //----------------------------------------Checking whether the data was sent successfully or not
+ while (client.connected()) {
+ String line = client.readStringUntil('\n');
+ if (line == "\r") {
+ Serial.println("headers received");
+ break;
+ }
+ }
+ String line = client.readStringUntil('\n');
+ if (line.startsWith("{\"state\":\"success\"")) {
+ Serial.println("ESP32 /Arduino CI successfull!");
+ } else {
+ Serial.println("ESP32 /Arduino CI has failed");
+ }
+ Serial.print("reply was : ");
+ Serial.println(line);
+ Serial.println("closing connection");
+ Serial.println("==========");
+ Serial.println();
+}
