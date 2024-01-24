@@ -197,38 +197,49 @@ void loop(){
     if (DOValue < 4000) {
       digitalWrite(AERATOR_PIN,HIGH);
       Serial.println("Aerator ON: DO below 4mg/L");
+      Blynk.virtualWrite(V5,1);
     } else{
       digitalWrite(AERATOR_PIN, LOW);
       Serial.println("Aerator OFF: DO above 4 mg/L");
+      Blynk.virtualWrite(V5,0);
     }
     // temperature control
     if (temperatureC < 26.0) {  // Check if temperature is below threshold
       digitalWrite(HEATER_PIN, HIGH);  // Turn off the relay
       Serial.println("Heater ON: Temperature below 26C");  // Optional logging
+      Blynk.virtualWrite(V6,1);
     } else {
       digitalWrite(HEATER_PIN, LOW);  // Turn off the relay
       Serial.println("Heater OFF: Temperature above 26C");  // Optional logging
+      Blynk.virtualWrite(V6,0);
     }
       } 
   else if (mode == 1) {
   //HEATER
     digitalWrite(HEATER_PIN, LOW);  // Turn off the relaY
     digitalWrite(AERATOR_PIN, LOW);  // Turn off the relaY
+    Blynk.virtualWrite(V6,0);
+    Blynk.virtualWrite(V5,0);
+
 
     if (heater_switch == 1){
     digitalWrite(HEATER_PIN, HIGH);  // Turn ON the relay
+    Blynk.virtualWrite(V6,1);
     }
 
     else if (heater_switch == 0) {
     digitalWrite(HEATER_PIN, LOW);  // Turn off the relaY
+    Blynk.virtualWrite(V6,0);
     }
     
     if (aerator_switch == 1){
     digitalWrite(AERATOR_PIN, HIGH);  // Turn ON the relay
+    Blynk.virtualWrite(V5,1);
     }
     
     else if (aerator_switch == 0) {
     digitalWrite(AERATOR_PIN, LOW);  // Turn off the relaY
+    Blynk.virtualWrite(V5,0);
     }
 
   }
