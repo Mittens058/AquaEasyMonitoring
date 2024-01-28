@@ -124,7 +124,7 @@ void setup() {
   pinMode(WP_UV_PIN, OUTPUT);
   pinMode(SERVO_PIN, OUTPUT);
   Blynk.begin(auth, ssid, pass);
-  //timer.setInterval(100L, sendSensor);
+  //timer.setInterval(1000L, sendSensor);
 }
 
 void loop(){
